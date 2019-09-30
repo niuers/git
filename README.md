@@ -1,68 +1,246 @@
 # Table of Contenst
 
+* [Fetch submodule within a git repository](#fetch-submodule-within-a-git-repository)
+* [Create a Tag](#create-a-tag)
+* [Remote branch](#remote-branch)
+* [git branch](#git-branch)
 
-Fetch submodule within a git repository
-$ git submodule init
-$ git submodule update
-$ git submodule foreach git pull origin master
-If you see modified submodule, update it:
-git submodule update 
+# Fetch submodule within a git repository
 
-Tag
+```
+git submodule init
+git submodule update
+git submodule foreach git pull origin master
+```
+
+If you see modified submodule, update it with: `git submodule update`
+
+# Create a Tag
+```
 git tag -a new_tag_name -m your_comment
 git push --tags
-Create a remote branch
-git checkout -b your_branch
-git push <remote-name> <local-branch-name>:<remote-branch-name> or simply:
+```
+
+# Remote branch
+## Create a remote branch
+```
+git checkout -b local-branch-name
+git push <remote-name> <local-branch-name>:<remote-branch-name>
+```
+
+or simply:
+
+```
 git push <remote-name> <branch-name>
+```
 where remote-name usually is 'origin'
-After created the remote branch, the other people need to update their branch information by:
+
+* After created the remote branch, the other people need to update their branch information by:
+```
 git fetch origin
-git branch --remote: then shows  the newly created branch 
-Delete remote branch
+git branch --remote  # shows the newly created branch
+```
+## Delete remote branch
+```
 git push origin --delete <branchName>
-git branch
-Create a new branch with specific commit: git branch new_branch_name commit_hash
-What does git fetch do?
-Push
-push to a specific remote branch: 
-git push remote-name <local-branch-name>:<remote-branch-name>
-Next
-Remote information
-show remote name: git remote
-display detail information on a remote: git remote show origin
-fetch/push url
-HEAD branch
-remote branches
-local push/pull configuration
-Trace a remote branch
-“Tracking” is essentially a link between a local and remote branch. When working on a local branch that tracks some other branch, you can git pull and git push without any extra arguments and git will know what to do.
-If you have already created the branch and want to make the current branch track a remote branch:
+```
+## Remote information
+* show remote name: `git remote`
+
+* Display following information on a remote: `git remote show origin`
+  * fetch/push url
+  * HEAD branch
+  * remote branches
+  * local push/pull configuration
+
+## Track a remote branch
+* “Tracking” is essentially a link between a local and remote branch. When working on a local branch that tracks some other branch, you can git pull and git push without any extra arguments and git will know what to do.
+* If you have already created the branch and want to make the current branch track a remote branch:
+```
 git branch --set-upstream <local-branch-name> <remote-name>/<remote-branch-name>, e.g. git branch --set-upstream test origin/test 
 git remote show origin: this will display the latest configuration of pull/push for your local branches
-Push a branch and automatically set a tracking
+```
+* Push a branch and automatically set a tracking
+```
 git push -u origin test
-Track a remote branch from someone else
-git checkout -t origin/feature: creates and checks out "feature" branch that tracks "origin/feature"
-Next
-Pull
-git pull <remote-name> <remote-branch-name>, e.g. git pull origin test
-Log
-Show branches, tags in git log: git log --oneline --decorate
-git log -1 master: Inspect the commit at the tip of the `master` branch
-Merge
-git merge feature:
-Incorporates changes from the named commits (since the time their histories diverged from the current branch) into the current branch. This command is used by git pull to incorporate changes from another repository and can be used by hand to merge changes from one branch into another.
+```
 
-The command will replay the changes made on the feature branch since it diverged from master until its current commit on top of master, and record the result in a new commit along with the names of the two parent commits and a log message from the user describing the changes.
-create a merge commit even when the merge resolves as a fast-forward
-use option: --no-ff
-Amend the most recent commit's message
+* Track a remote branch from someone else
+```
+git checkout -t origin/feature #creates and checks out "feature" branch that tracks "origin/feature"
+```
+
+# git branch
+* Create a new branch with specific commit: 
+```
+git branch new_branch_name commit_hash
+```
+
+## What does git fetch do?
+## Push
+* push to a specific remote branch: 
+```
+git push remote-name <local-branch-name>:<remote-branch-name>
+```
+
+
+
+# Pull
+```
+git pull <remote-name> <remote-branch-name>
+#for example
+git pull origin test
+```
+
+# Log
+* Show branches, tags in git log: 
+```
+git log --oneline --decorate
+```
+* Inspect the commit at the tip of the `master` branch
+```
+git log -1 master
+```
+
+# Merge
+* `git merge feature`
+  * Incorporates changes from the named commits (since the time their histories diverged from the current branch) into the current branch. This command is used by `git pull` to incorporate changes from another repository and can be used by hand to merge changes from one branch into another.
+  * The command will replay the changes made on the feature branch since it diverged from master until its current commit on top of master, and record the result in a new commit along with the names of the two parent commits and a log message from the user describing the changes.
+ 
+* To create a merge commit even when the merge resolves as a fast-forward, use option: `--no-ff`
+
+## Amend the most recent commit's message
+```
 git commit --amend
-Use wildcard in git command
-Put the file argument in single quote. e.g., git add 'src/pattern*'
-Next
-Refs and Reflogs
+```
+
+## Use wildcard in git command
+* Put the file argument in single quote. e.g., 
+```
+git add 'src/pattern*'
+```
+
+
+# Rebase and Merge
+
+* The first thing to understand about `git rebase` is that it solves the same problem as `git merge`. Both of these commands are designed to integrate changes from one branch into another branch—they just do it in very different ways.
+
+## Example
+
+* Consider what happens when you start working on a new feature in a dedicated branch named `feature`, then another team member updates the master branch with new commits.
+
+### Use merge
+* Merge in two steps:
+
+```
+git checkout feature
+git merge master
+```
+
+* Merge in one step:
+```
+git merge master feature
+```
+
+* Merging is nice because it’s a non-destructive operation. The existing branches are not changed in any way. This avoids all of the potential pitfalls of rebasing. 
+* On the other hand, this also means that the feature branch will have an extraneous merge commit every time you need to incorporate upstream changes. If master is very active, this can pollute your feature branch’s history quite a bit. While it’s possible to mitigate this issue with advanced git log options, it can make it hard for other developers to understand the history of the project.
+
+### Use rebase
+
+* rebase feature branch onto master branch
+
+```
+git checkout feature # git checkout <branch>
+git rebase master  # git rebase <upstream>
+```
+
+* All changes made by commits in the current branch that are not in <upstream> are saved to a temporary area. This is the same set of commits that would be shown by `git log <upstream>..HEAD` (or `git log HEAD`, if `--root` is specified). The current branch is reset to <upstream>.
+
+* The commits that were previously saved into the temporary area are then reapplied to the current branch, one by one, in order. Note, the commit hashes changed after applying to the current branch. 
+* It is possible that a merge failure will prevent this process from being completely automatic. You will have to resolve any such merge failure and run `git rebase --continue`. 
+  * Another option is to bypass the commit that caused the merge failure with `git rebase --skip`. 
+* To check out the original <branch> and remove the `.git/rebase-apply` working files, use the command `git rebase --abort` instead.
+
+* This moves the entire feature branch to begin on the tip of the master branch, effectively incorporating all of the new commits in master. But, instead of using a merge commit, rebasing re-writes the project history by creating brand new commits for each commit in the original feature branch. 
+* The major benefit of rebasing is that you get a much cleaner project history. 
+  * First, it eliminates the unnecessary merge commits required by `git merge`. 
+  * Second, as you can see in the above diagram, rebasing also results in a perfectly linear project history—you can follow the tip of feature all the way to the beginning of the project without any forks. This makes it easier to navigate your project with commands like `git log`, `git bisect`, and `gitk`.
+  
+* But, there are two trade-offs for this pristine commit history: safety and traceability. 
+  * If you don’t follow the **Golden Rule of Rebasing**, re-writing project history can be potentially catastrophic for your collaboration workflow. 
+  * And, less importantly, rebasing loses the context provided by a merge commit—you can’t see when upstream changes were incorporated into the feature.
+
+* Interactive rebasing: 
+  * Typically, this is used to clean up a messy history before merging a feature branch into master
+  * begin an interactive rebasing session, pass the `i` option to the `git rebase` command:
+  ```
+    git checkout feature
+    git rebase -i master
+  ```
+  * Eliminating insignificant commits like this makes your feature’s history much easier to understand. This is something that git merge simply cannot do.
+
+### The Golden Rule of Rebasing
+
+* The golden rule of git rebase is to never use it on public branches. 
+  * Since rebasing results in brand new commits, Git will think that your re-based master branch’s history has diverged from everybody else’s. So, before you run git rebase, always ask yourself, “Is anyone else looking at this branch?” If the answer is yes, take your hands off the keyboard and start thinking about a non-destructive way to make your changes (e.g., the `git revert` command). Otherwise, you’re safe to re-write history as much as you like.
+
+#### Force pushing
+* If you try to push the rebased master branch back to a remote repository, Git will prevent you from doing so because it conflicts with the remote master branch. But, you can force the push to go through by passing the `--force` flag, like so:
+```
+# Be very careful with this command!
+git push --force
+```
+
+* This overwrites the remote master branch to match the rebased one from your repository and makes things very confusing for the rest of your team. So, be very careful to use this command only when you know exactly what you’re doing.
+
+* One of the only times you should be force-pushing is when you’ve performed a local cleanup after you’ve pushed a private feature branch to a remote repository (e.g., for backup purposes). This is like saying, “Oops, I didn’t really want to push that original version of the feature branch. Take the current one instead.” Again, it’s important that nobody is working off of the commits from the original version of the feature branch.
+
+### Walkflow Walkthrough
+* The first step in any workflow that leverages `git rebase` is to create a dedicated branch for each feature. This gives you the necessary branch structure to safely utilize rebasing
+
+* Local Cleanup
+  * One of the best ways to incorporate rebasing into your workflow is to clean up local, in-progress features. By periodically performing an interactive rebase, you can make sure each commit in your feature is focused and meaningful. This lets you write your code without worrying about breaking it up into isolated commits—you can fix it up after the fact.
+
+  * When calling `git rebase`, you have two options for the new base: The feature’s parent branch (e.g., master), or an earlier commit in your feature. 
+    * We saw an example of the first option in the "Interactive Rebasing" section. 
+    * The latter option is nice when you only need to fix up the last few commits. For example, the following command begins an interactive rebase of only the last 3 commits.
+      ```
+      git checkout feature
+      git rebase -i HEAD~3
+      ```
+    * By specifying HEAD~3 as the new base, you’re not actually moving the branch—you’re just interactively re-writing the 3 commits that follow it. Note that this will not incorporate upstream changes into the feature branch.
+  
+  * If you want to re-write the entire feature using this method, the `git merge-base` command can be useful to find the original base of the feature branch. The following returns the commit ID of the original base, which you can then pass to git rebase:
+  `git merge-base feature master`
+  
+  * This use of interactive rebasing is a great way to introduce git rebase into your workflow, as it only affects local branches. The only thing other developers will see is your finished product, which should be a clean, easy-to-follow feature branch history.
+  * There is no git merge alternative for cleaning up local commits with an interactive rebase.
+
+* Incorporating upstream changes into a feature
+  * Keep in mind that it’s perfectly legal to rebase onto a remote branch instead of master. This can happen when collaborating on the same feature with another developer and you need to incorporate their changes into your repository.
+  * Note that this rebase doesn’t violate the Golden Rule of Rebasing because only your local feature commits are being moved—everything before that is untouched.
+  * By default, the `git pull` command performs a merge, but you can force it to integrate the remote branch with a rebase by passing it the `--rebase` option.
+
+* Reviewing a Feature With a Pull Request
+  * If you use pull requests as part of your code review process, you need to avoid using `git rebase` after creating the pull request. As soon as you make the pull request, other developers will be looking at your commits, which means that it’s a public branch. Re-writing its history will make it impossible for Git and your teammates to track any follow-up commits added to the feature.
+    * Any changes from other developers need to be incorporated with `git merge` instead of `git rebase`.
+    * For this reason, it’s usually a good idea to clean up your code with an interactive rebase before submitting your pull request.
+
+* Integrating an approved feature
+  * After a feature has been approved by your team, you have the option of rebasing the feature onto the tip of the master branch before using `git merge` to integrate the feature into the main code base.
+  * This is a similar situation to incorporating upstream changes into a feature branch, but since you’re not allowed to re-write commits in the master branch, you have to eventually use `git merge` to integrate the feature. However, by performing a rebase before the merge, you’re assured that the merge will be fast-forwarded, resulting in a perfectly linear history. This also gives you the chance to squash any follow-up commits added during a pull request.
+   * If you’re not entirely comfortable with `git rebase`, you can always perform the rebase in a temporary branch. That way, if you accidentally mess up your feature’s history, you can check out the original branch and try again. For example:
+   ```
+    git checkout feature
+    git checkout -b temporary-branch
+    git rebase -i master
+    # [Clean up the history]
+    git checkout master
+    git merge temporary-branch
+    ```
+
+
+# Refs and Reflogs
 Commit hash (SHA-1)
 This acts as the unique ID for each commit. It is the most direct way to reference a commit.
 git rev-parse branch-name
@@ -123,114 +301,6 @@ git reflog: display reflog
 The HEAD{<n>} syntax lets you reference commits stored in the reflog. You can use this to revert to a state that would otherwise be lost.For example, things lost with git reset.
 git checkout HEAD@{1}
 
-
-Rebase and Merge
-The first thing to understand about git rebase is that it solves the same problem as git merge. Both of these commands are designed to integrate changes from one branch into another branch—they just do it in very different ways.
-
-Example: Consider what happens when you start working on a new feature in a dedicated branch, then another team member updates the master branch with new commits.
-
-Use merge
-
-Merge in two steps:
-
-git checkout feature
-git merge master
-Merge in one step:
-git merge master feature
-
- Merging is nice because it’s a non-destructive operation. The existing branches are not changed in any way. This avoids all of the potential pitfalls of rebasing (discussed below). On the other hand, this also means that the feature branch will have an extraneous merge commit every time you need to incorporate upstream changes. If master is very active, this can pollute your feature branch’s history quite a bit. While it’s possible to mitigate this issue with advanced git log options, it can make it hard for other developers to understand the history of the project.
-
-Use rebase
-
-rebase feature branch onto master branch
-git checkout feature # git checkout <branch>
-git rebase master  # git rebase <upstream>
-
-All changes made by commits in the current branch but that are not in <upstream> are saved to a temporary area. This is the same set of commits that would be shown by git log <upstream>..HEAD (or git log HEAD, if --root is specified). The current branch is reset to <upstream>.  The commits that were previously saved into the temporary area are then reapplied to the current branch, one by one, in order. Note, the commit hashes changed after applying to the current branch. 
-
-It is possible that a merge failure will prevent this process from being completely automatic. You will have to resolve any such merge failure and run git rebase --continue. Another option is to bypass the commit that caused the merge failure with git rebase --skip. To check out the original <branch> and remove the .git/rebase-apply working files, use the command git rebase --abort instead.
-
-This moves the entire feature branch to begin on the tip of the master branch, effectively incorporating all of the new commits in master. But, instead of using a merge commit, rebasing re-writes the project history by creating brand new commits for each commit in the original feature branch. 
-
-The major benefit of rebasing is that you get a much cleaner project history. First, it eliminates the unnecessary merge commits required by git merge. Second, as you can see in the above diagram, rebasing also results in a perfectly linear project history—you can follow the tip of feature all the way to the beginning of the project without any forks. This makes it easier to navigate your project with commands like git log, git bisect, and gitk.
-
-But, there are two trade-offs for this pristine commit history: safety and traceability. If you don’t follow the Golden Rule of Rebasing, re-writing project history can be potentially catastrophic for your collaboration workflow. And, less importantly, rebasing loses the context provided by a merge commit—you can’t see when upstream changes were incorporated into the feature.
-
-Interactive rebasing
-
-Typically, this is used to clean up a messy history before merging a feature branch into master
-
-begin an interactive rebasing session, pass the i option to the git rebase command:
-git checkout feature
-git rebase -i master
-
-Eliminating insignificant commits like this makes your feature’s history much easier to understand. This is something that git merge simply cannot do.
-
-The Golden Rule of Rebasing
-
-The golden rule of git rebase is to never use it on public branches. Since rebasing results in brand new commits, Git will think that your re-based master branch’s history has diverged from everybody else’s. So, before you run git rebase, always ask yourself, “Is anyone else looking at this branch?” If the answer is yes, take your hands off the keyboard and start thinking about a non-destructive way to make your changes (e.g., the git revert command). Otherwise, you’re safe to re-write history as much as you like.
-
-Force pushing: 
-
-If you try to push the rebased master branch back to a remote repository, Git will prevent you from doing so because it conflicts with the remote master branch. But, you can force the push to go through by passing the --force flag, like so:
-
-# Be very careful with this command!
-git push --force
-This overwrites the remote master branch to match the rebased one from your repository and makes things very confusing for the rest of your team. So, be very careful to use this command only when you know exactly what you’re doing.
-
-One of the only times you should be force-pushing is when you’ve performed a local cleanup after you’ve pushed a private feature branch to a remote repository (e.g., for backup purposes). This is like saying, “Oops, I didn’t really want to push that original version of the feature branch. Take the current one instead.” Again, it’s important that nobody is working off of the commits from the original version of the feature branch.
-
- 
-
-Walkflow Walkthrough
-
-The first step in any workflow that leverages git rebase is to create a dedicated branch for each feature. This gives you the necessary branch structure to safely utilize rebasing
-
-Local Cleanup
-
-One of the best ways to incorporate rebasing into your workflow is to clean up local, in-progress features. By periodically performing an interactive rebase, you can make sure each commit in your feature is focused and meaningful. This lets you write your code without worrying about breaking it up into isolated commits—you can fix it up after the fact.
-
-When calling git rebase, you have two options for the new base: The feature’s parent branch (e.g., master), or an earlier commit in your feature. We saw an example of the first option in the Interactive Rebasing section. The latter option is nice when you only need to fix up the last few commits. For example, the following command begins an interactive rebase of only the last 3 commits.
-
-git checkout feature
-git rebase -i HEAD~3
-By specifying HEAD~3 as the new base, you’re not actually moving the branch—you’re just interactively re-writing the 3 commits that follow it. Note that this will not incorporate upstream changes into the feature branch.
-
-If you want to re-write the entire feature using this method, the git merge-base command can be useful to find the original base of the feature branch. The following returns the commit ID of the original base, which you can then pass to git rebase:
-
-git merge-base feature master
-This use of interactive rebasing is a great way to introduce git rebase into your workflow, as it only affects local branches. The only thing other developers will see is your finished product, which should be a clean, easy-to-follow feature branch history.
-
-There is no git merge alternative for cleaning up local commits with an interactive rebase.
-
-Incorporating upstream changes into a feature
-
-Keep in mind that it’s perfectly legal to rebase onto a remote branch instead of master. This can happen when collaborating on the same feature with another developer and you need to incorporate their changes into your repository.
-
-Note that this rebase doesn’t violate the Golden Rule of Rebasingbecause only your local feature commits are being moved—everything before that is untouched.
-
-By default, the git pull command performs a merge, but you can force it to integrate the remote branch with a rebase by passing it the --rebase option.
-
-Reviewing a Feature With a Pull Request
-
-If you use pull requests as part of your code review process, you need to avoid using git rebase after creating the pull request. As soon as you make the pull request, other developers will be looking at your commits, which means that it’s a public branch. Re-writing its history will make it impossible for Git and your teammates to track any follow-up commits added to the feature.
-
-Any changes from other developers need to be incorporated with git merge instead of git rebase.
-
-For this reason, it’s usually a good idea to clean up your code with an interactive rebase before submitting your pull request.
-
-Integrating an approved feature
-
-After a feature has been approved by your team, you have the option of rebasing the feature onto the tip of the master branch before usinggit merge to integrate the feature into the main code base.
-This is a similar situation to incorporating upstream changes into a feature branch, but since you’re not allowed to re-write commits in themaster branch, you have to eventually use git merge to integrate the feature. However, by performing a rebase before the merge, you’re assured that the merge will be fast-forwarded, resulting in a perfectly linear history. This also gives you the chance to squash any follow-up commits added during a pull request.
- If you’re not entirely comfortable with git rebase, you can always perform the rebase in a temporary branch. That way, if you accidentally mess up your feature’s history, you can check out the original branch and try again. For example:
-git checkout feature
-git checkout -b temporary-branch
-git rebase -i master
-# [Clean up the history]
-git checkout master
-git merge temporary-branch
-Next
 
  
 
