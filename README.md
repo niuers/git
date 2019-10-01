@@ -22,6 +22,7 @@ git push --tags
 ```
 
 # Remote branch
+
 ## Create a remote branch
 ```
 git checkout -b local-branch-name
@@ -44,6 +45,7 @@ git branch --remote  # shows the newly created branch
 ```
 git push origin --delete <branchName>
 ```
+
 ## Remote information
 * show remote name: `git remote`
 
@@ -76,33 +78,36 @@ git checkout -t origin/feature #creates and checks out "feature" branch that tra
 git branch new_branch_name commit_hash
 ```
 
-## What does git fetch do?
 ## Push
-* push to a specific remote branch: 
+* push to a specific remote branch
+
 ```
 git push remote-name <local-branch-name>:<remote-branch-name>
 ```
 
-
-
-# Pull
+## Pull
 ```
 git pull <remote-name> <remote-branch-name>
 #for example
 git pull origin test
 ```
 
-# Log
-* Show branches, tags in git log: 
+## Log
+
+* Show branches, tags in `git log`
+
 ```
 git log --oneline --decorate
 ```
+
 * Inspect the commit at the tip of the `master` branch
+
 ```
 git log -1 master
 ```
 
-# Merge
+# GIT Merge
+
 * `git merge feature`
   * Incorporates changes from the named commits (since the time their histories diverged from the current branch) into the current branch. This command is used by `git pull` to incorporate changes from another repository and can be used by hand to merge changes from one branch into another.
   * The command will replay the changes made on the feature branch since it diverged from master until its current commit on top of master, and record the result in a new commit along with the names of the two parent commits and a log message from the user describing the changes.
@@ -147,7 +152,7 @@ git merge master feature
 
 ### Use rebase
 
-* rebase feature branch onto master branch
+* Rebase feature branch onto master branch
 
 ```
 git checkout feature # git checkout <branch>
@@ -230,6 +235,7 @@ git push --force
   * After a feature has been approved by your team, you have the option of rebasing the feature onto the tip of the master branch before using `git merge` to integrate the feature into the main code base.
   * This is a similar situation to incorporating upstream changes into a feature branch, but since you’re not allowed to re-write commits in the master branch, you have to eventually use `git merge` to integrate the feature. However, by performing a rebase before the merge, you’re assured that the merge will be fast-forwarded, resulting in a perfectly linear history. This also gives you the chance to squash any follow-up commits added during a pull request.
    * If you’re not entirely comfortable with `git rebase`, you can always perform the rebase in a temporary branch. That way, if you accidentally mess up your feature’s history, you can check out the original branch and try again. For example:
+   
    ```
     git checkout feature
     git checkout -b temporary-branch
