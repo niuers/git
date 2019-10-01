@@ -5,6 +5,23 @@
 * [Remote branch](#remote-branch)
 * [git branch](#git-branch)
 
+# Rebase remote feature branch
+
+```
+git branch -D develop //this will remove your local develp repository
+git fetch //update references 
+git checkout develop //change to develop branch, but because you deleted, this command will also download the origin/develop
+git rebase -p origin/master
+```
+
+at this step you can have some conflits, so resolve then and git add FILES THAT HAD CONFLITSand git rebase --continue
+
+Now check if everything steel working after rebase, if yes
+
+```
+git push -f origin develop
+```
+
 # Fetch submodule within a git repository
 
 ```
